@@ -18,7 +18,7 @@ export const BasicExample: Story = {
       id: uuid(),
       name: "My Project",
       parent: null,
-      depth: 0,
+      depth: -1,
       subdirectories: [],
       documents: [],
     };
