@@ -1,0 +1,44 @@
+@use '../../../../styles/variables' as *;
+@use '../styles.module.scss' as *;
+
+.container {
+  position: relative;
+  flex-grow: 1;
+}
+
+.input {
+  appearance: none;
+  background-color: transparent;
+  color: $color-white;
+  padding: $outer-spacing 0;
+  width: 100%;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  font-family: $font-family-jetbrains-mono;
+  font-size: $font-size-sm;
+  height: $explorer-icon-size + 2 * $outer-spacing;
+  outline: 1px solid $color-teal-bright;
+}
+
+.invalidInput {
+  @extend .input;
+  outline: 1px solid $color-red-brick;
+}
+
+.error {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 100%;
+  background-color: $color-red-brick;
+  outline: 1px solid $color-red-brick;
+  font-family: $font-family-jetbrains-mono;
+  font-size: $font-size-xs;
+  color: $color-white;
+  z-index: 1;
+
+  &:empty {
+    display: none;
+  }
+}

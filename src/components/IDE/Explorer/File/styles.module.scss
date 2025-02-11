@@ -1,0 +1,72 @@
+@use '../../../../styles/variables' as *;
+
+.baseFile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+
+  .controls {
+    visibility: hidden;
+  }
+
+  .overlay {
+    display: none;
+  }
+}
+
+.file {
+  @extend .baseFile;
+
+  &:hover {
+    background-color: $color-teal-dark;
+
+    .controls {
+      visibility: visible;
+    }
+  }
+
+  &:focus-within {
+    background-color: $color-teal-dark;
+    outline: 1px solid $color-teal-bright;
+    z-index: 1;
+
+    .controls {
+      visibility: visible;
+    }
+  }
+}
+
+.openedFile {
+  @extend .file;
+  background-color: $color-teal-dark;
+}
+
+.activeFile {
+  @extend .file;
+  background-color: $color-teal-dark;
+  justify-content: flex-start;
+  z-index: 1;
+
+  &:focus-within {
+    outline: none;
+  }
+}
+
+.disabledFile {
+  @extend .baseFile;
+
+  .overlay {
+    display: initial;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}

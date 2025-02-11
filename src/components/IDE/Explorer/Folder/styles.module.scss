@@ -1,0 +1,75 @@
+@use '../../../../styles/variables' as *;
+
+.container {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.baseFolder {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .controls {
+    visibility: hidden;
+  }
+
+  .overlay {
+    display: none;
+  }
+}
+
+.folder {
+  @extend .baseFolder;
+
+  &:hover {
+    background-color: $color-teal-dark;
+
+    .controls {
+      visibility: visible;
+    }
+  }
+
+  &:focus-within {
+    background-color: $color-teal-dark;
+    outline: 1px solid $color-teal-bright;
+    z-index: 1;
+
+    .controls {
+      visibility: visible;
+    }
+  }
+}
+
+.collapsedWithOpenChild {
+  @extend .folder;
+  background-color: $color-teal-dark;
+}
+
+.activeFolder {
+  @extend .folder;
+  background-color: $color-teal-dark;
+  justify-content: flex-start;
+  z-index: 1;
+
+  &:focus-within {
+    outline: none;
+  }
+}
+
+.disabledFolder {
+  @extend .baseFolder;
+
+  .overlay {
+    display: initial;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}

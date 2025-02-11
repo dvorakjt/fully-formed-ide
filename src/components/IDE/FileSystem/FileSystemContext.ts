@@ -2,7 +2,7 @@ import { createContext } from "react";
 import type { Directory } from "@/model/directory";
 import type { FileSystemNode } from "@/model/file-system-node";
 
-interface FileSystemContextType {
+export interface FileSystemContextType {
   rootDirectory: Directory;
   nodes: Record<string, FileSystemNode>;
   addDirectory(parentId: string, name: string): void;

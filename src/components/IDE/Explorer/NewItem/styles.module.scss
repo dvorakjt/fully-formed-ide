@@ -1,0 +1,21 @@
+@use '../../../../styles/variables' as *;
+@use '../styles.module.scss' as *;
+
+.newItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  background-color: $color-teal-dark;
+  z-index: 1;
+
+  img {
+    margin-right: $inner-spacing;
+  }
+}
+
+:export {
+  iconSize: $explorer-icon-size;
+  outerSpacing: $outer-spacing;
+  innerSpacing: $inner-spacing;
+}

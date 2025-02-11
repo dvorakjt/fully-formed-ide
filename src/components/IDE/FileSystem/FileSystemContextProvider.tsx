@@ -3,7 +3,7 @@ import { useState, useCallback, type ReactNode } from "react";
 import { produce } from "immer";
 import { v4 as uuid } from "uuid";
 import { FileSystemContext } from "./FileSystemContext";
-import { alphabetizeNodes } from "@/components/IDE/FileSystem/utils/alphabetize-nodes";
+import { alphabetizeNodes } from "@/util/file-system/alphabetize-nodes";
 import { FileSystemError } from "./FileSystemError";
 import type { FileSystemNode } from "@/model/file-system-node";
 import type { Directory } from "@/model/directory";

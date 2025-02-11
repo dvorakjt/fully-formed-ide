@@ -1,0 +1,38 @@
+@use '../../../../styles/variables' as *;
+@use '../styles.module.scss' as *;
+
+:export {
+  iconSize: $explorer-icon-size;
+  outerSpacing: $outer-spacing;
+  innerSpacing: $inner-spacing;
+}
+
+.selector {
+  cursor: pointer;
+  margin: 0;
+  padding-top: $outer-spacing;
+  padding-bottom: $outer-spacing;
+  padding-right: $inner-spacing;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  color: $color-white;
+  font-family: $font-family-jetbrains-mono;
+  font-size: $font-size-sm;
+  display: flex;
+  align-items: center;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.selectorWithName {
+  @extend .selector;
+  flex-grow: 1;
+}
+
+.name {
+  margin-left: $inner-spacing;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

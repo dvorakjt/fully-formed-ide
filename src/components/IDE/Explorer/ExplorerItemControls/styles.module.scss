@@ -1,0 +1,32 @@
+@use '../../../../styles/variables' as *;
+@use '../styles.module.scss' as *;
+
+:export {
+  iconSize: $explorer-icon-size;
+}
+
+.controls {
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  padding-right: $outer-spacing;
+
+  li {
+    margin: 0;
+    padding: 0;
+
+    button {
+      margin: 0;
+      padding: 0;
+      background-color: transparent;
+      border: none;
+      border-radius: 0;
+      color: $color-white;
+    }
+
+    &:has(+ li) {
+      margin-right: $inner-spacing;
+    }
+  }
+}

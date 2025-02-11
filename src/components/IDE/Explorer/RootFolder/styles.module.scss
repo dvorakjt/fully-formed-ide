@@ -1,0 +1,32 @@
+@use '../../../../styles/variables' as *;
+@use '../styles.module.scss' as *;
+
+.rootFolder {
+  width: 300px;
+}
+
+.header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: $font-family-jetbrains-mono;
+  padding-top: $outer-spacing;
+  padding-left: $outer-spacing;
+  padding-bottom: $outer-spacing;
+
+  h3 {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.overlay {
+  display: initial;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
