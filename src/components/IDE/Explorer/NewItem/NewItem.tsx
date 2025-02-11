@@ -1,8 +1,8 @@
-import Image from 'next/image';
-import { ExplorerItemNameEditor } from '../ExplorerItemNameEditor';
-import { calculateExplorerItemLeftPadding } from '@/util/calculate-explorer-item-left-padding';
-import type { StaticImport } from 'next/dist/shared/lib/get-img-props';
-import styles from './styles.module.scss';
+import Image from "next/image";
+import { ExplorerItemNameEditor } from "../ExplorerItemNameEditor";
+import { calculateLeftPadding } from "@/util/explorer/calculate-left-padding";
+import type { StaticImport } from "next/dist/shared/lib/get-img-props";
+import styles from "./styles.module.scss";
 
 interface NewItemProps {
   inputLabel: string;
@@ -18,8 +18,8 @@ export function NewItem(props: NewItemProps) {
   const iconSize = parseInt(styles.iconSize);
   const outerSpacing = parseInt(styles.outerSpacing);
   const innerSpacing = parseInt(styles.innerSpacing);
-  const paddingLeft = calculateExplorerItemLeftPadding({
-    indentation: props.indentation,
+  const paddingLeft = calculateLeftPadding({
+    depth: props.indentation,
     iconSize,
     outerSpacing,
     innerSpacing,

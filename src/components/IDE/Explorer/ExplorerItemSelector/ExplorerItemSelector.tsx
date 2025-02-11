@@ -1,8 +1,8 @@
-import Image from 'next/image';
-import { calculateExplorerItemLeftPadding } from '../../../../util/calculate-explorer-item-left-padding';
-import type { StaticImport } from 'next/dist/shared/lib/get-img-props';
-import type { MouseEventHandler } from 'react';
-import styles from './styles.module.scss';
+import Image from "next/image";
+import { calculateLeftPadding } from "@/util/explorer/calculate-left-padding";
+import type { StaticImport } from "next/dist/shared/lib/get-img-props";
+import type { MouseEventHandler } from "react";
+import styles from "./styles.module.scss";
 
 interface ExplorerItemSelectorProps {
   itemName: string;
@@ -10,7 +10,7 @@ interface ExplorerItemSelectorProps {
   iconAlt: string;
   indentation: number;
   showName: boolean;
-  ['aria-label']: string;
+  ["aria-label"]: string;
   onClick: MouseEventHandler;
   onDoubleClick?: MouseEventHandler;
 }
@@ -21,15 +21,15 @@ export function ExplorerItemSelector({
   iconAlt,
   indentation,
   showName,
-  ['aria-label']: ariaLabel,
+  ["aria-label"]: ariaLabel,
   onClick,
   onDoubleClick,
 }: ExplorerItemSelectorProps) {
   const iconSize = parseInt(styles.iconSize);
   const outerSpacing = parseInt(styles.outerSpacing);
   const innerSpacing = parseInt(styles.innerSpacing);
-  const paddingLeft = calculateExplorerItemLeftPadding({
-    indentation,
+  const paddingLeft = calculateLeftPadding({
+    depth: indentation,
     iconSize,
     outerSpacing,
     innerSpacing,

@@ -1,5 +1,5 @@
 import { FileSystemContextProvider } from "./FileSystemContextProvider";
-import { initNodes } from "./utils/init-nodes";
+import { initNodes } from "../../../util/file-system/init-nodes";
 import type { ReactNode } from "react";
 import type { Directory } from "@/model/directory";
 

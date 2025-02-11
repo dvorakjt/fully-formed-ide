@@ -1,5 +1,5 @@
 "use client";
-import { useState, useCallback, type ReactNode } from "react";
+import { useState, useCallback, type ReactNode, useEffect } from "react";
 import { produce } from "immer";
 import { v4 as uuid } from "uuid";
 import { FileSystemContext } from "./FileSystemContext";

@@ -1,0 +1,17 @@
+@use './variables' as *;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: $color-black;
+  font-family: $font-family-lilita-one;
+  color: $color-white;
+}
+
+button {
+  cursor: pointer;
+}
