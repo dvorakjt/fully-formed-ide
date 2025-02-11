@@ -1,15 +1,15 @@
 import { createContext } from "react";
 import type { Directory } from "@/model/directory";
-import type { Document } from "@/model/document";
+import type { FileSystemNode } from "@/model/file-system-node";
 
 interface FileSystemContextType {
   rootDirectory: Directory;
-  useDocument(documentId: string): Document | null;
-  addSubdirectory(directoryId: string, name: string): void;
-  addDocument(directoryId: string, name: string): void;
-  updateContents(documentId: string, contents: string): void;
-  renameNode(nodeId: string, name: string): void;
-  moveNode(nodeId: string, destinationId: string): void;
+  nodes: Record<string, FileSystemNode>;
+  addDirectory(parentId: string, name: string): void;
+  addDocument(parentId: string, name: string): void;
+  updateContents(documentId: string, newContents: string): void;
+  renameNode(nodeId: string, newName: string): void;
+  moveNode(nodeId: string, newParentOrSiblingId: string): void;
   removeNode(nodeId: string): void;
 }
 

@@ -1,150 +1,206 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { useState, useCallback, type ReactNode } from "react";
+import { produce } from "immer";
 import { v4 as uuid } from "uuid";
 import { FileSystemContext } from "./FileSystemContext";
-import { NodeNotFoundError } from "@/errors/node-not-found-error";
+import { alphabetizeNodes } from "@/components/IDE/FileSystem/utils/alphabetize-nodes";
+import { FileSystemError } from "./FileSystemError";
 import type { FileSystemNode } from "@/model/file-system-node";
 import type { Directory } from "@/model/directory";
 import type { Document } from "@/model/document";
-import { alphabetizeNodes } from "@/util/alphabetize-nodes";
 
-// parent will be a server component that accepts a root directory
-// all other props will be calculated at build time on the server
-interface FileSystemProps {
+interface FileSystemContextProviderProps {
   rootDirectory: Directory;
   nodes: Record<string, FileSystemNode>;
-  /**
-   * A dictionary whose keys are absolute paths and
-   * whose values are the ids of files in which they
-   * are imported.
-   */
-  exports: Record<string, string>;
-  /**
-   * A dictionary whose keys are the ids of files
-   * and whose values are the absolute paths imported
-   * in those files.
-   */
-  imports: Record<string, string>;
   children?: ReactNode;
 }
 
 export function FileSystemContextProvider({
   rootDirectory,
   nodes,
-  exports,
-  imports,
   children,
-}: FileSystemProps) {
+}: FileSystemContextProviderProps) {
   const [state, setState] = useState({
     rootDirectory,
     nodes,
-    exports,
-    imports,
   });
 
-  function useDocument(documentId: string): Document | null {
-    const maybeDocument = state.nodes[documentId];
-    return maybeDocument ? (maybeDocument as Document) : null;
-  }
+  const addDirectory = useCallback((parentId: string, name: string) => {
+    setState(
+      produce((draft) => {
+        const maybeParent = draft.nodes[parentId];
+        if (!maybeParent || maybeParent.type !== "directory") {
+          throw new FileSystemError(
+            `Cannot add subdirectory. Directory with id "${parentId}" does not exist.`
+          );
+        }
 
-  function addSubdirectory(directoryId: string, name: string): void {
-    const maybeParent = state.nodes[directoryId];
-    if (!maybeParent)
-      throw new NodeNotFoundError(
-        "Failed to add subdirectory. Parent directory does not exist."
+        const parent = maybeParent as Directory;
+        const newDirectory: Directory = {
+          type: "directory",
+          id: uuid(),
+          name,
+          parent,
+          depth: parent.depth + 1,
+          subdirectories: [],
+          documents: [],
+        };
+        parent.subdirectories.push(newDirectory);
+        alphabetizeNodes(parent.subdirectories);
+        draft.nodes[newDirectory.id] = newDirectory;
+      })
+    );
+  }, []);
+
+  const addDocument = useCallback((parentId: string, name: string) => {
+    setState(
+      produce((draft) => {
+        const maybeParent = draft.nodes[parentId];
+        if (!maybeParent || maybeParent.type !== "directory") {
+          throw new FileSystemError(
+            `Cannot add document. Directory with id "${parentId}" does not exist.`
+          );
+        }
+
+        const parent = maybeParent as Directory;
+        const newDocument: Document = {
+          type: "document",
+          id: uuid(),
+          name,
+          parent,
+          depth: parent.depth + 1,
+          contents: "",
+        };
+        parent.documents.push(newDocument);
+        alphabetizeNodes(parent.documents);
+        draft.nodes[newDocument.id] = newDocument;
+      })
+    );
+  }, []);
+
+  const updateContents = useCallback(
+    (documentId: string, newContents: string) => {
+      setState(
+        produce((draft) => {
+          const maybeDocument = draft.nodes[documentId];
+          if (!maybeDocument || maybeDocument.type !== "document") {
+            throw new FileSystemError(
+              `Could not update contents of document with id "${documentId}." No such document exists.`
+            );
+          }
+
+          const document = maybeDocument as Document;
+          document.contents = newContents;
+        })
       );
+    },
+    []
+  );
 
-    const parent = maybeParent as Directory;
-    const newDirectory: Directory = {
-      id: uuid(),
-      name,
-      parent,
-      depth: parent.depth + 1,
-      subdirectories: [],
-      documents: [],
-    };
+  const renameNode = useCallback((nodeId: string, newName: string) => {
+    setState(
+      produce((draft) => {
+        const maybeNode = draft.nodes[nodeId];
+        if (!maybeNode) {
+          throw new FileSystemError(
+            `Could not rename node with id "${nodeId}." No such node exists.`
+          );
+        }
 
-    const updatedSiblings = alphabetizeNodes([
-      ...parent.subdirectories,
-      newDirectory,
-    ]);
+        const node = maybeNode as FileSystemNode;
+        node.name = newName;
+      })
+    );
+  }, []);
 
-    let rootDirectory: Directory = {
-      ...parent,
-      subdirectories: updatedSiblings,
-    };
+  const moveNode = useCallback(
+    (nodeId: string, newParentOrSiblingId: string) => {
+      setState(
+        produce((draft) => {
+          const node = draft.nodes[nodeId];
+          if (!node) {
+            throw new FileSystemError(
+              `Could not move node with id "${nodeId}." No such node exists.`
+            );
+          }
 
-    while (rootDirectory.parent) {
-      rootDirectory = rootDirectory.parent;
-    }
+          const originalParent = node.parent;
+          if (!originalParent) {
+            throw new FileSystemError("Cannot move the root node.");
+          }
 
-    setState({
-      rootDirectory,
-      nodes: {
-        ...state.nodes,
-        [newDirectory.id]: newDirectory,
-      },
-      exports,
-      imports,
-    });
-  }
+          originalParent.subdirectories = originalParent.subdirectories.filter(
+            (d) => d.id !== node.id
+          );
 
-  function addDocument(directoryId: string, name: string): void {
-    const maybeParent = state.nodes[directoryId];
-    if (!maybeParent)
-      throw new NodeNotFoundError(
-        "Failed to add subdirectory. Parent directory does not exist."
+          const newParentOrSibling = draft.nodes[newParentOrSiblingId];
+          const maybeNewParent =
+            newParentOrSibling?.type === "directory"
+              ? newParentOrSibling
+              : newParentOrSibling?.parent;
+
+          if (!maybeNewParent) {
+            throw new FileSystemError(
+              "Could not move node. Destination does not exist."
+            );
+          }
+
+          const newParent = maybeNewParent as Directory;
+          node.parent = newParent;
+          node.depth = node.parent.depth + 1;
+
+          if (node.type === "directory") {
+            node.parent.subdirectories.push(node as Directory);
+            alphabetizeNodes(node.parent.subdirectories);
+          } else {
+            node.parent.documents.push(node as Document);
+            alphabetizeNodes(node.parent.documents);
+          }
+        })
       );
+    },
+    []
+  );
 
-    const parent = maybeParent as Directory;
-    const newDocument: Document = {
-      id: uuid(),
-      name,
-      parent,
-      depth: parent.depth + 1,
-      contents: "",
-    };
+  const removeNode = useCallback((nodeId: string) => {
+    setState(
+      produce((draft) => {
+        const node = draft.nodes[nodeId];
+        if (!node) {
+          throw new FileSystemError(
+            `Cannot remove node with id ${nodeId}. No such node exists.`
+          );
+        }
 
-    const updatedSiblings = alphabetizeNodes([
-      ...parent.documents,
-      newDocument,
-    ]);
+        const maybeParent = node.parent;
+        if (!maybeParent) {
+          throw new FileSystemError("Could not remove the root node.");
+        }
 
-    let rootDirectory: Directory = {
-      ...parent,
-      documents: updatedSiblings,
-    };
+        const parent = maybeParent as Directory;
+        if (node.type === "directory") {
+          parent.subdirectories = parent.subdirectories.filter(
+            (d) => d.id !== nodeId
+          );
+        } else {
+          parent.documents = parent.documents.filter((d) => d.id !== nodeId);
+        }
 
-    while (rootDirectory.parent) {
-      rootDirectory = rootDirectory.parent;
-    }
-
-    setState({
-      rootDirectory,
-      nodes: {
-        ...state.nodes,
-        [newDocument.id]: newDocument,
-      },
-      exports,
-      imports,
-    });
-  }
-
-  // updateContents(documentId: string, contents: string): void;
-
-  // renameNode(nodeId: string, name: string): void;
-
-  // moveNode(nodeId: string, destinationId: string): void;
-
-  // removeNode(nodeId: string): void;
+        delete draft.nodes[nodeId];
+      })
+    );
+  }, []);
 
   return (
     <FileSystemContext.Provider
       value={{
-        rootDirectory: state.rootDirectory,
-        useDocument,
-        addSubdirectory,
+        ...state,
+        addDirectory,
         addDocument,
+        updateContents,
+        renameNode,
+        moveNode,
+        removeNode,
       }}
     >
       {children}

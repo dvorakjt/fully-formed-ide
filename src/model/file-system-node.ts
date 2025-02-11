@@ -5,4 +5,5 @@ export interface FileSystemNode {
   name: string;
   parent: Directory | null;
   depth: number;
+  type: "directory" | "document";
 }

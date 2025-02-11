@@ -1,4 +1,4 @@
-import { alphabetizeNodes } from "@/util/alphabetize-nodes";
+import { alphabetizeNodes } from "@/components/IDE/FileSystem/utils/alphabetize-nodes";
 import type { Document } from "@/model/document";
 
 describe("alphabetize", () => {
