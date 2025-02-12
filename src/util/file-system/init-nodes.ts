@@ -10,6 +10,7 @@ export function initNodes(
 
   for (const directory of rootDirectory.subdirectories) {
     nodes = {
+      ...nodes,
       ...initNodes(directory),
     };
   }
