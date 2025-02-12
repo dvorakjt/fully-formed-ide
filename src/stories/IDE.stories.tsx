@@ -1,7 +1,7 @@
 import { IDE } from "@/components/IDE";
 import { v4 as uuid } from "uuid";
 import type { Meta, StoryObj } from "@storybook/react";
-import type { Directory } from "@/model/directory";
+import type { FileSystemContents } from "@/model/file-system-contents";
 
 const meta: Meta<typeof IDE> = {
   component: IDE,
@@ -13,16 +13,41 @@ type Story = StoryObj<typeof IDE>;
 
 export const BasicExample: Story = {
   render: function BasicExample() {
-    const rootDirectory: Directory = {
-      type: "directory",
-      id: uuid(),
-      name: "My Project",
-      parent: null,
-      depth: -1,
-      subdirectories: [],
-      documents: [],
+    const fileSystemContents: FileSystemContents = {
+      name: "My Awesome Project",
+      subdirectories: [
+        {
+          name: "src",
+          subdirectories: [
+            {
+              name: "MyComponent",
+              documents: [
+                {
+                  name: "MyComponent.tsx",
+                },
+                {
+                  name: "index.tsx",
+                },
+                {
+                  name: "styles.module.css",
+                },
+              ],
+            },
+          ],
+          documents: [
+            {
+              name: "main.css",
+            },
+          ],
+        },
+      ],
+      documents: [
+        {
+          name: "package.json",
+        },
+      ],
     };
 
-    return <IDE rootDirectory={rootDirectory} />;
+    return <IDE fileSystemContents={fileSystemContents} />;
   },
 };

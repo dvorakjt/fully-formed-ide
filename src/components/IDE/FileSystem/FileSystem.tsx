@@ -1,15 +1,16 @@
 import { FileSystemContextProvider } from "./FileSystemContextProvider";
 import { initNodes } from "../../../util/file-system/init-nodes";
+import { initRootDirectory } from "@/util/file-system/init-root-directory";
 import type { ReactNode } from "react";
-import type { Directory } from "@/model/directory";
+import type { FileSystemContents } from "@/model/file-system-contents";
 
 interface FileSystemProps {
-  rootDirectory: Directory;
+  contents: FileSystemContents;
   children?: ReactNode;
 }
 
-export function FileSystem({ rootDirectory, children }: FileSystemProps) {
-  // Nodes are precomputed once at build time.
+export function FileSystem({ contents, children }: FileSystemProps) {
+  const rootDirectory = initRootDirectory(contents);
   const nodes = initNodes(rootDirectory);
 
   return (
