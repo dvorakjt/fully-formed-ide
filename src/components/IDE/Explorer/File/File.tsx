@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { DragEventHandler, useContext, useState } from "react";
 import { FileSystemContext } from "../../FileSystem/FileSystemContext";
 import { OpenDocumentsContext } from "../../OpenDocumentsContext/OpenDocumentsContext";
 import { ExplorerContext } from "../ExplorerContext";
@@ -48,6 +48,21 @@ export function File({ document }: FileProps) {
     }
   }
 
+  const onDragStart: DragEventHandler = (e) => {
+    e.stopPropagation();
+    e.dataTransfer.setData("text/plain", document.id);
+  };
+
+  const onDrop: DragEventHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const nodeId = e.dataTransfer.getData("text/plain");
+    if (!nodeId) return;
+
+    fileSystem.moveNode(nodeId, document.id);
+  };
+
   const className = (() => {
     if (activeNodeId) {
       if (activeNodeId === document.id) {
@@ -68,6 +83,9 @@ export function File({ document }: FileProps) {
     <li
       className={className}
       style={{ justifyContent: isRenaming ? "flex-start" : "space-between" }}
+      draggable
+      onDragStart={onDragStart}
+      onDrop={onDrop}
     >
       <ExplorerItemSelector
         itemName={document.name}

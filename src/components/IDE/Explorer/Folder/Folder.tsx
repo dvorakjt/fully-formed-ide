@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, DragEventHandler } from "react";
 import { FileSystemContext } from "../../FileSystem/FileSystemContext";
 import { OpenDocumentsContext } from "../../OpenDocumentsContext/OpenDocumentsContext";
 import { ExplorerContext } from "../ExplorerContext";
@@ -92,6 +92,27 @@ export function Folder({ directory }: FolderProps) {
     }
   }
 
+  const onDragStart: DragEventHandler = (e) => {
+    e.stopPropagation();
+    e.dataTransfer.setData("text/plain", directory.id);
+  };
+
+  const onDragOver: DragEventHandler = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    setIsExpanded(true);
+  };
+
+  const onDrop: DragEventHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const nodeId = e.dataTransfer.getData("text/plain");
+    if (!nodeId) return;
+
+    fileSystem.moveNode(nodeId, directory.id);
+  };
+
   useEffect(() => {
     if (openDocumentId && hasChild(directory, openDocumentId)) {
       setIsExpanded(true);
@@ -99,7 +120,13 @@ export function Folder({ directory }: FolderProps) {
   }, [directory, openDocumentId]);
 
   return (
-    <li className={styles.container}>
+    <li
+      className={styles.container}
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
       <div className={className}>
         <ExplorerItemSelector
           itemName={directory.name}

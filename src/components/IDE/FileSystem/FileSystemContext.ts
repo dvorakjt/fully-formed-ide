@@ -5,6 +5,7 @@ import type { FileSystemNode } from "@/model/file-system-node";
 export interface FileSystemContextType {
   rootDirectory: Directory;
   nodes: Record<string, FileSystemNode>;
+  errorMessage: string;
   addDirectory(parentId: string, name: string): void;
   addDocument(parentId: string, name: string): void;
   updateContents(documentId: string, newContents: string): void;

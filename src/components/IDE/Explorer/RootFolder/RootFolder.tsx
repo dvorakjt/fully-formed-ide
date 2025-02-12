@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useState } from "react";
+import { DragEventHandler, useContext, useState } from "react";
 import { FileSystemContext } from "../../FileSystem/FileSystemContext";
 import { ExplorerContext } from "../ExplorerContext";
 import { ExplorerItemControls } from "../ExplorerItemControls";
@@ -8,7 +8,7 @@ import { Action } from "../Folder/action";
 import styles from "./styles.module.scss";
 
 export function RootFolder() {
-  const { rootDirectory } = useContext(FileSystemContext)!;
+  const fileSystem = useContext(FileSystemContext)!;
 
   const { activeNodeId, setActiveNodeId, clearActiveNode } =
     useContext(ExplorerContext)!;
@@ -16,7 +16,7 @@ export function RootFolder() {
   const [action, setAction] = useState<Action>(Action.None);
 
   function beginAction(action: Action) {
-    setActiveNodeId(rootDirectory.id);
+    setActiveNodeId(fileSystem.rootDirectory.id);
     setAction(action);
   }
 
@@ -25,12 +25,29 @@ export function RootFolder() {
     clearActiveNode();
   }
 
-  const isDisabled = !!activeNodeId && activeNodeId !== rootDirectory.id;
+  const onDragOver: DragEventHandler = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const onDrop: DragEventHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const nodeId = e.dataTransfer.getData("text/plain");
+    if (!nodeId) return;
+
+    fileSystem.moveNode(nodeId, fileSystem.rootDirectory.id);
+  };
+
+  const isDisabled =
+    (!!activeNodeId && activeNodeId !== fileSystem.rootDirectory.id) ||
+    action !== Action.None;
 
   return (
-    <nav className={styles.rootFolder}>
+    <nav className={styles.rootFolder} onDragOver={onDragOver} onDrop={onDrop}>
       <header className={styles.header}>
-        <h3>{rootDirectory.name}</h3>
+        <h3>{fileSystem.rootDirectory.name}</h3>
         <ExplorerItemControls
           controls={[
             {
@@ -56,7 +73,7 @@ export function RootFolder() {
         {isDisabled && <div className={styles.overlay}></div>}
       </header>
       <FolderMenu
-        directory={rootDirectory}
+        directory={fileSystem.rootDirectory}
         action={action}
         endAction={endAction}
       />
